@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Study Plan{% endblock %}
+{% block content %}
+<h1>🗓 My 7-Day Study Plan</h1>
+<p class="subtitle">Built from your quiz results: weakest topics first, then topics you haven't tried. It updates as you improve.</p>
+
+{% for d in plan %}
+<div class="section">
+    <h2>{{ d.day }} — {{ d.topic }}</h2>
+    <p class="muted">{{ d.status }}</p>
+    <ul class="tasks">
+        {% for t in d.tasks %}
+        <li>{{ t.icon }}
+            {% if t.url %}<a href="{{ t.url }}" {% if t.url.startswith('http') %}target="_blank" rel="noopener noreferrer"{% endif %}>{{ t.text }}</a>
+            {% else %}{{ t.text }}{% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% endfor %}
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block title %}
+Recommendations
+{% endblock %}
+
+{% block content %}
+
+<h1>Personalized Learning Recommendations</h1>
+
+<p>
+    These recommendations are based on your performance.
+</p>
+
+
+<div class="section">
+
+    <h2>Your Weak Topics</h2>
+
+    {% if weak_topics %}
+
+        {% for topic in weak_topics %}
+
+        <div class="topic-box">
+
+            <strong>
+                {{ topic["topic"] }}
+            </strong>
+
+            <span>
+                Score: {{ topic["score"] }}%
+            </span>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No weak topics detected.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<div class="section">
+
+    <h2>Recommended Actions</h2>
+
+    {% for recommendation in recommendations %}
+
+    <div class="recommendation">
+
+        ✓ {{ recommendation }}
+
+    </div>
+
+    {% endfor %}
+
+</div>
+
+{% endblock %}

@@ -1,0 +1,113 @@
+{% extends "base.html" %}
+
+{% block title %}
+Progress
+{% endblock %}
+
+{% block content %}
+
+<h1>Progress Tracking</h1>
+
+<div class="cards">
+
+    <div class="card">
+
+        <h3>Attendance</h3>
+
+        <div class="big-number">
+            {{ student["attendance"] }}%
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Previous Marks</h3>
+
+        <div class="big-number">
+            {{ student["previous_marks"] }}%
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Assignment</h3>
+
+        <div class="big-number">
+            {{ student["assignment_marks"] }}%
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Quiz</h3>
+
+        <div class="big-number">
+            {{ student["quiz_marks"] }}%
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="section">
+
+    <h2>Quiz History</h2>
+
+    {% if results %}
+
+    <table>
+
+        <tr>
+
+            <th>Topic</th>
+            <th>Score</th>
+            <th>Percentage</th>
+            <th>Date</th>
+
+        </tr>
+
+
+        {% for result in results %}
+
+        <tr>
+
+            <td>
+                {{ result["topic"] }}
+            </td>
+
+            <td>
+                {{ result["score"] }}/{{ result["total"] }}
+            </td>
+
+            <td>
+                {{ "%.2f"|format(result["percentage"]) }}%
+            </td>
+
+            <td>
+                {{ result["created_at"] }}
+            </td>
+
+        </tr>
+
+        {% endfor %}
+
+    </table>
+
+    {% else %}
+
+    <p>
+        No quiz results available yet.
+    </p>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

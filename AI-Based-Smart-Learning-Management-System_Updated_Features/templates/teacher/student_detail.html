@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+{% block title %}{{ student.name }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('teacher.students') }}">← All students</a></p>
+<h1>{{ student.name }}</h1>
+<p class="subtitle">{{ student.email }} · Streak {{ student.streak or 0 }} days · Prediction: <strong>{{ student.prediction }}</strong></p>
+
+<div class="grid-2">
+<div class="form-card">
+    <h2>Update records</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Previous marks (%)</label>
+        <input type="number" name="previous_marks" min="0" max="100" step="0.1" value="{{ student.previous_marks }}" required>
+        <label>Attendance (%)</label>
+        <input type="number" name="attendance" min="0" max="100" step="0.1" value="{{ student.attendance }}" required>
+        <p class="muted">Assignment marks ({{ "%.0f"|format(student.assignment_marks or 0) }}%) come from graded work; quiz marks ({{ "%.0f"|format(student.quiz_marks or 0) }}%) from quizzes. Saving re-runs the prediction.</p>
+        <button type="submit">Save & re-predict</button>
+    </form>
+</div>
+
+<div class="section">
+    <h2>Topic averages</h2>
+    {% if topic_avgs %}
+    <table>
+        {% for t in topic_avgs %}
+        <tr><td>{{ t.topic }}</td><td>{{ "%.0f"|format(t.avg) }}%</td><td>{{ t.attempts }} attempt(s)</td>
+            <td>{% if t.avg < 60 %}<span class="tag danger">Weak</span>{% endif %}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p>No quizzes taken.</p>{% endif %}
+</div>
+</div>
+
+<div class="section">
+    <h2>Recent quizzes</h2>
+    {% if quizzes %}
+    <table>
+        <tr><th>Topic</th><th>Score</th><th>When</th></tr>
+        {% for q in quizzes %}<tr><td>{{ q.topic }}</td><td>{{ q.score }}/{{ q.total }} ({{ "%.0f"|format(q.percentage) }}%)</td><td>{{ q.created_at[:16] }}</td></tr>{% endfor %}
+    </table>
+    {% else %}<p>None yet.</p>{% endif %}
+</div>
+
+<div class="section">
+    <h2>Assignment submissions</h2>
+    {% if submissions %}
+    <table>
+        <tr><th>Assignment</th><th>Submitted</th><th>Grade</th><th></th></tr>
+        {% for s in submissions %}
+        <tr><td>{{ s.title }}</td><td>{{ s.submitted_at[:16] }}</td>
+            <td>{{ ("%g / %g"|format(s.marks, s.max_marks)) if s.marks is not none else "Not graded" }}</td>
+            <td><a href="{{ url_for('teacher.assignment_detail', assignment_id=s.assignment_id) }}">Open</a></td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p>None yet.</p>{% endif %}
+</div>
+{% endblock %}

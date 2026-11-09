@@ -1,0 +1,223 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="container">
+
+    <h1>📊 Student Performance Prediction</h1>
+
+    <p>
+        Enter your academic details to predict your performance.
+    </p>
+
+
+    <!-- ========================================= -->
+    <!-- PREDICTION FORM -->
+    <!-- ========================================= -->
+
+    <div class="card">
+
+        <h2>Enter Academic Details</h2>
+
+        <form method="POST"
+              action="{{ url_for('predict') }}">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+            <!-- Previous Marks -->
+
+            <label for="previous_marks">
+                Previous Marks (%)
+            </label>
+
+            <input
+                type="number"
+                id="previous_marks"
+                name="previous_marks"
+                min="0"
+                max="100"
+                step="0.01"
+                value="{{ student.previous_marks if student else 0 }}"
+                required
+            >
+
+
+            <!-- Assignment Marks -->
+
+            <label for="assignment_marks">
+                Assignment Marks (%)
+            </label>
+
+            <input
+                type="number"
+                id="assignment_marks"
+                name="assignment_marks"
+                min="0"
+                max="100"
+                step="0.01"
+                value="{{ student.assignment_marks if student else 0 }}"
+                required
+            >
+
+
+            <!-- Quiz Marks -->
+
+            <label for="quiz_marks">
+                Quiz Marks (%)
+            </label>
+
+            <input
+                type="number"
+                id="quiz_marks"
+                name="quiz_marks"
+                min="0"
+                max="100"
+                step="0.01"
+                value="{{ student.quiz_marks if student else 0 }}"
+                required
+            >
+
+
+            <!-- Attendance -->
+
+            <label for="attendance">
+                Attendance (%)
+            </label>
+
+            <input
+                type="number"
+                id="attendance"
+                name="attendance"
+                min="0"
+                max="100"
+                step="0.01"
+                value="{{ student.attendance if student else 0 }}"
+                required
+            >
+
+
+            <br><br>
+
+            <button type="submit">
+                🔮 Predict Performance
+            </button>
+
+        </form>
+
+    </div>
+
+
+    <!-- ========================================= -->
+    <!-- PREDICTION RESULT -->
+    <!-- ========================================= -->
+
+    {% if prediction %}
+
+    <div class="card">
+
+        <h2>Prediction Result</h2>
+
+        <p>
+            Your predicted academic performance is:
+        </p>
+
+
+        {% if prediction == "Good" %}
+
+            <h1>
+                🟢 Good
+            </h1>
+
+            <p>
+                Excellent! Keep maintaining your
+                current performance.
+            </p>
+
+
+        {% elif prediction == "Average" %}
+
+            <h1>
+                🟡 Average
+            </h1>
+
+            <p>
+                Your performance is average.
+                Try to improve your marks,
+                attendance and quiz scores.
+            </p>
+
+
+        {% else %}
+
+            <h1>
+                🔴 Needs Improvement
+            </h1>
+
+            <p>
+                You need to focus more on your studies,
+                assignments and quizzes.
+            </p>
+
+        {% endif %}
+
+    </div>
+
+    {% endif %}
+
+
+    {% if prediction and details %}
+    <div class="card">
+        <h2>Why this prediction?</h2>
+        <table>
+            <tr><th>Model confidence</th><td>{{ details.confidence }}%</td></tr>
+            <tr><th>Weighted score</th><td>{{ details.weighted_score }} / 100</td></tr>
+            <tr><th>Biggest area to improve</th><td>{{ details.focus_area|capitalize }}</td></tr>
+            {% if details.points_to_good > 0 %}
+            <tr><th>Points needed for "Good"</th><td>+{{ details.points_to_good }}</td></tr>
+            {% endif %}
+        </table>
+        <p class="muted">Weights: previous marks 30%, assignments 25%, quizzes 25%, attendance 20%.</p>
+    </div>
+    {% endif %}
+
+
+    <!-- ========================================= -->
+    <!-- ENTERED DETAILS -->
+    <!-- ========================================= -->
+
+    {% if prediction %}
+
+    <div class="card">
+
+        <h2>Your Academic Details</h2>
+
+        <table>
+
+            <tr>
+                <th>Previous Marks</th>
+                <td>{{ previous_marks }}%</td>
+            </tr>
+
+            <tr>
+                <th>Assignment Marks</th>
+                <td>{{ assignment_marks }}%</td>
+            </tr>
+
+            <tr>
+                <th>Quiz Marks</th>
+                <td>{{ quiz_marks }}%</td>
+            </tr>
+
+            <tr>
+                <th>Attendance</th>
+                <td>{{ attendance }}%</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

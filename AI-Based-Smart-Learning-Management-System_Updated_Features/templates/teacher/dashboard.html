@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Teacher Overview{% endblock %}
+{% block content %}
+<h1>👩‍🏫 Class Overview</h1>
+<p class="subtitle">Spot struggling students early and see which topics need re-teaching</p>
+
+<div class="cards">
+    <div class="card"><h3>Students</h3><div class="big-number">{{ summary.students }}</div></div>
+    <div class="card"><h3>Avg attendance</h3><div class="big-number">{{ summary.avg_attendance }}%</div></div>
+    <div class="card"><h3>Avg quiz score</h3><div class="big-number">{{ summary.avg_quiz }}%</div></div>
+    <div class="card"><h3>At-risk students</h3><div class="big-number">{{ summary.at_risk }}</div></div>
+    <div class="card"><h3>To grade</h3><div class="big-number">{{ summary.pending }}</div>
+        <a href="{{ url_for('teacher.assignments') }}">Open assignments</a></div>
+</div>
+
+<div class="grid-2">
+    <div class="section"><h2>Predicted performance</h2><div class="chart-box"><div id="perf"></div></div></div>
+    <div class="section"><h2>Average score by topic</h2>
+        {% if topic_stats %}<div class="chart-box"><div id="topics"></div></div>
+        {% else %}<p>No quiz attempts yet.</p>{% endif %}</div>
+</div>
+
+<div class="section">
+    <h2>⚠ At-risk students</h2>
+    <p class="muted">Predicted "Needs Improvement", or attendance below 75%.</p>
+    {% if at_risk %}
+    <table>
+        <tr><th>Name</th><th>Prediction</th><th>Attendance</th><th>Quiz avg</th><th></th></tr>
+        {% for s in at_risk %}
+        <tr>
+            <td>{{ s.name }}</td><td>{{ s.prediction }}</td><td>{{ s.attendance }}%</td><td>{{ "%.0f"|format(s.quiz_marks or 0) }}%</td>
+            <td><a href="{{ url_for('teacher.student_detail', student_id=s.id) }}">View</a></td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% else %}<p>No at-risk students right now. 🎉</p>{% endif %}
+</div>
+
+<div class="section">
+    <h2>Recent quiz activity</h2>
+    {% if recent %}
+    <table>
+        <tr><th>Student</th><th>Topic</th><th>Score</th><th>When</th></tr>
+        {% for r in recent %}
+        <tr><td><a href="{{ url_for('teacher.student_detail', student_id=r.student_id) }}">{{ r.name }}</a></td>
+            <td>{{ r.topic }}</td><td>{{ r.score }}/{{ r.total }} ({{ "%.0f"|format(r.percentage) }}%)</td><td>{{ r.created_at[:16] }}</td></tr>
+        {% endfor %}
+    </table>
+    {% else %}<p>No activity yet.</p>{% endif %}
+</div>
+
+<p><a class="button secondary" href="{{ url_for('teacher.export_students') }}">⬇ Export students (CSV)</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+const counts = {{ counts|tojson }};
+const topicStats = {{ topic_stats|tojson }};
+const order = ["Good", "Average", "Needs Improvement", "Not Predicted"];
+LMSCharts.doughnut(document.getElementById("perf"), order, order.map(k => counts[k] || 0),
+    ["#16a34a", "#f59e0b", "#dc2626", "#9ca3af"]);
+if (document.getElementById("topics")) {
+    LMSCharts.bars(document.getElementById("topics"), topicStats.map(t => t.topic),
+        [{label: "Average %", data: topicStats.map(t => t.avg), color: "#2563eb"}]);
+}
+</script>
+{% endblock %}

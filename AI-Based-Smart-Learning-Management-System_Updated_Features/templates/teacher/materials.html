@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Manage Materials{% endblock %}
+{% block content %}
+<h1>📚 Learning Materials</h1>
+<p class="subtitle">Students see these in their Materials page and study plan. Topics marked weak are highlighted to them.</p>
+
+<div class="form-card">
+    <h2>Add material</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Title</label>
+        <input type="text" name="title" maxlength="150" required>
+        <label>Topic</label>
+        <input type="text" name="topic" list="topic-list" maxlength="60" required placeholder="e.g. Python">
+        <datalist id="topic-list">{% for t in topics %}<option value="{{ t }}">{% endfor %}</datalist>
+        <label>Type</label>
+        <select name="kind">{% for k in kinds %}<option>{{ k }}</option>{% endfor %}</select>
+        <label>Link (https://...)</label>
+        <input type="url" name="url" required>
+        <label>Short description (optional)</label>
+        <input type="text" name="description" maxlength="500">
+        <button type="submit">Add</button>
+    </form>
+</div>
+
+<div class="section">
+    <table>
+        <tr><th>Topic</th><th>Title</th><th>Type</th><th></th></tr>
+        {% for m in materials %}
+        <tr><td>{{ m.topic }}</td><td><a href="{{ m.url }}" target="_blank" rel="noopener noreferrer">{{ m.title }}</a></td><td>{{ m.kind }}</td>
+            <td><form method="POST" action="{{ url_for('teacher.delete_material', item_id=m.id) }}" onsubmit="return confirm('Delete?')">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger-btn small">Delete</button></form></td></tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

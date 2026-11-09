@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz Result{% endblock %}
+
+{% block content %}
+
+<div class="card">
+
+    <h1>🎉 Quiz Completed!</h1>
+    <h2>{{ topic }}</h2>
+
+    <div class="score">
+        <h1>{{ score }} / {{ total }}</h1>
+        <h2>{{ "%.0f"|format(percentage) }}%</h2>
+    </div>
+
+    <p class="muted">+{{ xp_gained }} XP earned</p>
+
+    {% if percentage >= 80 %}
+        <p>🟢 Excellent performance! Keep up the good work.</p>
+    {% elif percentage >= 60 %}
+        <p>🟡 Good performance! Try to improve further.</p>
+    {% else %}
+        <p>🔴 You need more practice. Review the answers below, then try again.</p>
+    {% endif %}
+
+    {% for b in new_badges %}
+        <div class="alert success">New badge unlocked: {{ b.icon }} <strong>{{ b.name }}</strong></div>
+    {% endfor %}
+
+    <p>
+        <a href="{{ url_for('quiz', topic=topic) }}" class="button">🔁 Retake {{ topic }}</a>
+        <a href="{{ url_for('quiz') }}" class="button secondary">📝 Another quiz</a>
+        <a href="{{ url_for('dashboard') }}" class="button secondary">🏠 Dashboard</a>
+    </p>
+
+</div>
+
+<div class="section">
+    <h2>Answer review</h2>
+
+    {% for r in review %}
+    <div class="review-item {{ 'right' if r.is_correct else 'wrong' }}">
+        <p><strong>{{ loop.index }}. {{ r.question }}</strong></p>
+        <p>
+            {% if r.is_correct %}
+                ✅ Your answer: {{ r.selected }}
+            {% else %}
+                ❌ Your answer: {{ r.selected or "(no answer)" }}<br>
+                ✔ Correct answer: <strong>{{ r.correct }}</strong>
+            {% endif %}
+        </p>
+        {% if r.explanation %}<p class="muted">💡 {{ r.explanation }}</p>{% endif %}
+    </div>
+    {% endfor %}
+</div>
+
+{% endblock %}

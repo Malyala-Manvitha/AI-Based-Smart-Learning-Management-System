@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block title %}Analytics{% endblock %}
+{% block content %}
+<h1>📊 My Analytics</h1>
+<p class="subtitle">How you are doing across quizzes and academic areas</p>
+
+<div class="cards">
+    <div class="card"><h3>Quizzes taken</h3><div class="big-number">{{ quiz_count }}</div></div>
+    <div class="card"><h3>Strongest topic</h3><div class="big-number small">{{ best[0] if best else "—" }}</div>{% if best %}<p class="muted">{{ best[1] }}% avg</p>{% endif %}</div>
+    <div class="card"><h3>Needs most work</h3><div class="big-number small">{{ worst[0] if worst else "—" }}</div>{% if worst %}<p class="muted">{{ worst[1] }}% avg</p>{% endif %}</div>
+    <div class="card"><h3>Recent trend</h3>
+        <div class="big-number small">{% if change is none %}—{% else %}{{ "+" if change > 0 }}{{ change }}%{% endif %}</div>
+        <p class="muted">last 3 quizzes vs the 3 before</p></div>
+</div>
+
+{% if quiz_count %}
+<div class="grid-2">
+    <div class="section"><h2>Quiz score over time</h2><div class="chart-box"><div id="trend" class="chart-target"></div></div></div>
+    <div class="section"><h2>Topic average vs class</h2><div class="chart-box"><div id="topics" class="chart-target"></div></div></div>
+</div>
+{% else %}
+<div class="section"><p>Take a few quizzes to unlock your charts.</p><a class="button" href="{{ url_for('quiz') }}">Take a quiz</a></div>
+{% endif %}
+
+<div class="section"><h2>Academic profile</h2><div class="chart-box short"><div id="components" class="chart-target"></div></div></div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script>
+const D = {{ data|tojson }};
+const $ = id => document.getElementById(id);
+if ($("trend")) {
+    LMSCharts.line($("trend"), D.trend_labels, D.trend_values, D.trend_topics);
+    LMSCharts.bars($("topics"), D.topics, [
+        {label: "You", data: D.my_avg, color: "#2563eb"},
+        {label: "Class average", data: D.class_avg, color: "#9ca3af"}]);
+}
+LMSCharts.hbars($("components"), D.components_labels, D.components, ["#2563eb", "#16a34a", "#f59e0b", "#8b5cf6"]);
+</script>
+{% endblock %}

@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block content %}
+
+<h1>Welcome, {{ student["name"] }} 👋</h1>
+
+<p class="subtitle">
+    Your personalized learning dashboard
+</p>
+
+
+{% if announcements %}
+<div class="section announcement-strip">
+    <h2>📢 Announcements</h2>
+    {% for a in announcements %}
+        <p><strong>{{ a.title }}</strong> <span class="muted">· {{ a.created_at[:10] }}</span><br>{{ a.message }}</p>
+    {% endfor %}
+    <a href="{{ url_for('extras.announcements') }}">See all</a>
+</div>
+{% endif %}
+
+<div class="cards">
+
+    <div class="card">
+
+        <h3>Attendance</h3>
+
+        <div class="big-number">
+            {{ student["attendance"] }}%
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Quiz Average</h3>
+
+        <div class="big-number">
+            {{ average_quiz }}%
+        </div>
+
+    </div>
+
+
+    <div class="card">
+
+        <h3>Performance</h3>
+
+        <div class="big-number">
+            {{ student["prediction"] }}
+        </div>
+
+    </div>
+
+
+    <div class="card">
+        <h3>Level {{ level }}</h3>
+        <div class="big-number">{{ xp }} XP</div>
+        <p class="muted">🔥 {{ student["streak"] or 0 }}-day streak · 🏅 {{ badge_count }} badges</p>
+    </div>
+
+    <div class="card">
+
+        <h3>Weak Topics</h3>
+
+        <div class="big-number">
+            {{ weak_topics|length }}
+        </div>
+
+    </div>
+
+</div>
+
+
+<div class="section">
+
+    <h2>Academic Information</h2>
+
+    <table>
+
+        <tr>
+            <th>Previous Marks</th>
+            <td>{{ student["previous_marks"] }}%</td>
+        </tr>
+
+        <tr>
+            <th>Assignment Marks</th>
+            <td>{{ student["assignment_marks"] }}%</td>
+        </tr>
+
+        <tr>
+            <th>Quiz Marks</th>
+            <td>{{ student["quiz_marks"] }}%</td>
+        </tr>
+
+        <tr>
+            <th>Attendance</th>
+            <td>{{ student["attendance"] }}%</td>
+        </tr>
+
+        <tr>
+            <th>Prediction</th>
+            <td>{{ student["prediction"] }}</td>
+        </tr>
+
+    </table>
+
+</div>
+
+
+<div class="section">
+
+    <h2>Weak Topics</h2>
+
+    {% if weak_topics %}
+
+        {% for topic in weak_topics %}
+
+            <div class="topic-box">
+
+                <strong>
+                    {{ topic["topic"] }}
+                </strong>
+
+                <span>
+                    Average Score:
+                    {{ topic["score"] }}%
+                </span>
+
+            </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            No weak topics found yet.
+            Take some quizzes to analyze your performance.
+        </p>
+
+    {% endif %}
+
+</div>
+
+
+<div class="section">
+    <h2>Assignments to do</h2>
+    {% if open_assignments %}
+        <table>
+            {% for a in open_assignments %}
+            <tr>
+                <td><a href="{{ url_for('extras.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+                <td>{{ ("Due " ~ a.due_date) if a.due_date else "No due date" }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>You're all caught up. 🎉</p>
+    {% endif %}
+</div>
+
+
+<div class="section">
+    <h2>Recommended next steps</h2>
+    {% for r in recommendations %}
+        <div class="recommendation">{{ r }}</div>
+    {% endfor %}
+</div>
+
+
+<div class="quick-links">
+
+    <a href="{{ url_for('extras.study_plan') }}">My Study Plan</a>
+
+    <a href="{{ url_for('extras.analytics') }}">Analytics</a>
+
+    <a href="{{ url_for('extras.achievements') }}">Achievements</a>
+
+
+    <a href="{{ url_for('predict') }}">
+        Performance Prediction
+    </a>
+
+    <a href="{{ url_for('quiz') }}">
+        Take Quiz
+    </a>
+
+    <a href="{{ url_for('tutor') }}">
+        Ask AI Tutor
+    </a>
+
+    <a href="{{ url_for('recommendations') }}">
+        View Recommendations
+    </a>
+
+</div>
+
+{% endblock %}

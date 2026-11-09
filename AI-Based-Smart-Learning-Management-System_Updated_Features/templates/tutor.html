@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+
+{% block title %}AI Tutor{% endblock %}
+
+{% block content %}
+
+<div class="tutor-container">
+
+    <h1>🤖 AI Tutor</h1>
+
+    <p>Ask a question about Python, Machine Learning, SQL, web development or data structures.</p>
+
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+        <textarea name="question" maxlength="500"
+                  placeholder="Ask something like: What is overfitting?"
+                  required>{{ question or "" }}</textarea>
+
+        <button type="submit">Ask AI Tutor</button>
+    </form>
+
+    {% if result %}
+    <div class="answer-box">
+        <h3>AI Tutor Answer</h3>
+        <p>{{ result.answer }}</p>
+
+        {% if result.topic %}
+        <p class="muted">
+            Topic: <strong>{{ result.topic }}</strong> · Match: {{ result.confidence }}%
+        </p>
+        <p>
+            <a class="button small" href="{{ url_for('quiz', topic=result.topic) }}" {% if result.topic not in quiz_topics %}hidden{% endif %}>Quiz me on {{ result.topic }}</a>
+            <a class="button small secondary" href="{{ url_for('extras.materials', topic=result.topic) }}">Study materials</a>
+        </p>
+        {% endif %}
+
+        {% if result.related %}
+        <p class="muted">You could also ask:</p>
+        <ul>
+            {% for r in result.related %}<li>{{ r }}</li>{% endfor %}
+        </ul>
+        {% endif %}
+    </div>
+    {% endif %}
+
+    {% if history %}
+    <div class="section">
+        <h2>Recent questions</h2>
+        {% for h in history %}
+        <details class="history-item">
+            <summary>{{ h.question }} <span class="muted">· {{ h.created_at[:16] }}</span></summary>
+            <p>{{ h.answer }}</p>
+        </details>
+        {% endfor %}
+    </div>
+    {% endif %}
+
+</div>
+
+{% endblock %}

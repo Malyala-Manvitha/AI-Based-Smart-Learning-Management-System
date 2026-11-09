@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Learning Materials{% endblock %}
+{% block content %}
+<h1>📚 Learning Materials</h1>
+<p class="subtitle">Curated resources to help you improve. Topics marked ⚠ are ones you're currently weak in.</p>
+
+<div class="chip-row">
+    <a class="chip {{ '' if selected else 'active' }}" href="{{ url_for('extras.materials') }}">All</a>
+    {% for t in topics %}
+        <a class="chip {{ 'active' if t == selected else '' }}" href="{{ url_for('extras.materials', topic=t) }}">
+            {{ '⚠ ' if t in weak_topics }}{{ t }}
+        </a>
+    {% endfor %}
+</div>
+
+<div class="cards">
+    {% for m in materials %}
+    <div class="card material-card">
+        <span class="tag">{{ m.kind }}</span>
+        <span class="tag topic">{{ m.topic }}</span>
+        <h3>{{ m.title }}</h3>
+        {% if m.description %}<p class="muted">{{ m.description }}</p>{% endif %}
+        <a class="button small" href="{{ m.url }}" target="_blank" rel="noopener noreferrer">Open ↗</a>
+    </div>
+    {% else %}
+    <p>No materials for this topic yet.</p>
+    {% endfor %}
+</div>
+{% endblock %}

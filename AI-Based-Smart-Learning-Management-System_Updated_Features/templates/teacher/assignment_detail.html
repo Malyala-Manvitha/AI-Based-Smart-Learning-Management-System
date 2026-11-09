@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+{% block title %}{{ assignment.title }}{% endblock %}
+{% block content %}
+<p><a href="{{ url_for('teacher.assignments') }}">← All assignments</a></p>
+<h1>{{ assignment.title }}</h1>
+<p class="subtitle">{{ "%g"|format(assignment.max_marks) }} marks{% if assignment.due_date %} · Due {{ assignment.due_date }}{% endif %}</p>
+<p class="pre">{{ assignment.description }}</p>
+
+<div class="section">
+    <h2>Submissions ({{ submissions|length }})</h2>
+    {% for s in submissions %}
+    <div class="review-item {{ 'right' if s.marks is not none else '' }}">
+        <p><strong>{{ s.name }}</strong> <span class="muted">· {{ s.email }} · {{ s.submitted_at[:16] }}</span></p>
+        <p class="pre">{{ s.content }}</p>
+        <form method="POST" class="inline-form">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+            <input type="hidden" name="submission_id" value="{{ s.id }}">
+            <input type="number" name="marks" min="0" max="{{ assignment.max_marks }}" step="any" placeholder="Marks / {{ '%g'|format(assignment.max_marks) }}" value="{{ s.marks if s.marks is not none }}" required>
+            <input type="text" name="feedback" maxlength="1000" placeholder="Feedback" value="{{ s.feedback }}">
+            <button type="submit">{{ "Update grade" if s.marks is not none else "Grade" }}</button>
+        </form>
+    </div>
+    {% else %}<p>No submissions yet.</p>{% endfor %}
+</div>
+
+{% if not_submitted %}
+<div class="section">
+    <h2>Not submitted ({{ not_submitted|length }})</h2>
+    <p>{{ not_submitted|map(attribute='name')|join(', ') }}</p>
+</div>
+{% endif %}
+{% endblock %}

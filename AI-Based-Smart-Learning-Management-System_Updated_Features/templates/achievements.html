@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block title %}Achievements{% endblock %}
+{% block content %}
+<h1>🏆 Achievements</h1>
+<p class="subtitle">Earn XP from quizzes (10 per correct answer), assignments (20 each) and badges (50 each)</p>
+
+<div class="cards">
+    <div class="card">
+        <h3>Level</h3>
+        <div class="big-number">{{ level }}</div>
+        <div class="progress"><div style="width: {{ xp_into_level }}%"></div></div>
+        <p class="muted">{{ xp_into_level }}/100 XP to level {{ level + 1 }}</p>
+    </div>
+    <div class="card"><h3>Total XP</h3><div class="big-number">{{ xp }}</div></div>
+    <div class="card"><h3>Learning streak</h3><div class="big-number">🔥 {{ student["streak"] or 0 }}</div><p class="muted">days in a row</p></div>
+    <div class="card"><h3>Class rank</h3><div class="big-number">#{{ my_rank or "-" }}</div><p class="muted">of {{ total_students }} students</p></div>
+</div>
+
+<div class="section">
+    <h2>Badges ({{ earned_count }}/{{ badges|length }})</h2>
+    <div class="badge-grid">
+        {% for b in badges %}
+        <div class="badge-tile {{ '' if b.earned_at else 'locked' }}">
+            <div class="badge-icon">{{ b.icon }}</div>
+            <strong>{{ b.name }}</strong>
+            <span class="muted">{{ b.description }}</span>
+            {% if b.earned_at %}<span class="tag">Earned {{ b.earned_at[:10] }}</span>{% endif %}
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<div class="section">
+    <h2>Leaderboard (top 10)</h2>
+    <table>
+        <tr><th>#</th><th>Student</th><th>Level</th><th>XP</th></tr>
+        {% for r in leaderboard %}
+        <tr class="{{ 'me' if r.id == session['user_id'] else '' }}">
+            <td>{{ r.rank }}</td><td>{{ r.name }}{{ " (you)" if r.id == session['user_id'] }}</td><td>{{ r.level }}</td><td>{{ r.xp }}</td>
+        </tr>
+        {% endfor %}
+    </table>
+</div>
+{% endblock %}

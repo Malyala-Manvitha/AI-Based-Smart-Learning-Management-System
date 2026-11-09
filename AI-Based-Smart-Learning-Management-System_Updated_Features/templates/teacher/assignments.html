@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% block title %}Assignments{% endblock %}
+{% block content %}
+<h1>📝 Assignments</h1>
+
+<div class="form-card">
+    <h2>Create assignment</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Title</label>
+        <input type="text" name="title" maxlength="150" required>
+        <label>Instructions</label>
+        <textarea name="description" rows="4" maxlength="3000"></textarea>
+        <label>Topic (optional)</label>
+        <select name="topic"><option value="">—</option>{% for t in topics %}<option>{{ t }}</option>{% endfor %}</select>
+        <label>Due date (optional)</label>
+        <input type="date" name="due_date">
+        <label>Maximum marks</label>
+        <input type="number" name="max_marks" value="100" min="1" max="1000" step="any">
+        <button type="submit">Create</button>
+    </form>
+</div>
+
+<div class="section">
+{% if assignments %}
+<table>
+    <tr><th>Title</th><th>Due</th><th>Max</th><th>Submitted</th><th>To grade</th><th></th></tr>
+    {% for a in assignments %}
+    <tr>
+        <td><a href="{{ url_for('teacher.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+        <td>{{ a.due_date or "—" }}</td><td>{{ "%g"|format(a.max_marks) }}</td><td>{{ a.submitted }}</td><td>{{ a.ungraded or 0 }}</td>
+        <td><form method="POST" action="{{ url_for('teacher.delete_assignment', assignment_id=a.id) }}" onsubmit="return confirm('Delete this assignment and all its submissions?')">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"><button class="danger-btn small">Delete</button></form></td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}<p>No assignments yet.</p>{% endif %}
+</div>
+{% endblock %}

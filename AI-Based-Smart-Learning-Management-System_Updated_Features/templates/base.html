@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>
+        {% block title %}
+        AI Learning Management System
+        {% endblock %}
+    </title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/style.css') }}">
+
+</head>
+
+<body>
+
+<header class="navbar">
+
+    <div class="logo">
+        <a href="{{ url_for('home') }}">AI Smart LMS</a>
+        {% if session.get('role') == 'teacher' %}<span class="tag">Teacher</span>{% endif %}
+    </div>
+
+    {% if session.get('user_id') and session.get('role') == 'teacher' %}
+
+    <nav>
+        <a href="{{ url_for('teacher.dashboard') }}">Overview</a>
+        <a href="{{ url_for('teacher.students') }}">Students</a>
+        <a href="{{ url_for('teacher.assignments') }}">Assignments</a>
+        <a href="{{ url_for('teacher.materials') }}">Materials</a>
+        <a href="{{ url_for('teacher.announcements') }}">Announcements</a>
+        <a href="{{ url_for('extras.profile') }}">Profile</a>
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    {% elif session.get('user_id') %}
+
+    <nav>
+        <a href="{{ url_for('dashboard') }}">Dashboard</a>
+        <a href="{{ url_for('quiz') }}">Quiz</a>
+        <a href="{{ url_for('tutor') }}">AI Tutor</a>
+        <a href="{{ url_for('extras.study_plan') }}">Study Plan</a>
+        <a href="{{ url_for('extras.assignments') }}">Assignments</a>
+        <a href="{{ url_for('extras.materials') }}">Materials</a>
+        <a href="{{ url_for('extras.analytics') }}">Analytics</a>
+        <a href="{{ url_for('extras.achievements') }}">Achievements</a>
+
+        <details class="more-menu">
+            <summary>More</summary>
+            <div>
+                <a href="{{ url_for('predict') }}">Performance</a>
+                <a href="{{ url_for('attendance') }}">Attendance</a>
+                <a href="{{ url_for('recommendations') }}">Recommendations</a>
+                <a href="{{ url_for('progress') }}">Progress</a>
+                <a href="{{ url_for('extras.announcements') }}">Announcements</a>
+                <a href="{{ url_for('extras.profile') }}">Profile</a>
+            </div>
+        </details>
+
+        <a href="{{ url_for('logout') }}">Logout</a>
+    </nav>
+
+    {% endif %}
+
+</header>
+
+
+<main class="container">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+
+        {% if messages %}
+
+            {% for category, message in messages %}
+
+                <div class="alert {{ category }}">
+                    {{ message }}
+                </div>
+
+            {% endfor %}
+
+        {% endif %}
+
+    {% endwith %}
+
+
+    {% block content %}
+
+    {% endblock %}
+
+</main>
+
+
+{% block scripts %}{% endblock %}
+
+<script src="{{ url_for('static', filename='js/script.js') }}"></script>
+
+</body>
+
+</html>

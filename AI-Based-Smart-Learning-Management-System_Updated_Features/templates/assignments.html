@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% block title %}Assignments{% endblock %}
+{% block content %}
+<h1>📝 Assignments</h1>
+<p class="subtitle">Submit your work and see your grades and feedback</p>
+
+<div class="section">
+{% if assignments %}
+<table>
+    <tr><th>Title</th><th>Due</th><th>Status</th><th>Grade</th></tr>
+    {% for a in assignments %}
+    <tr>
+        <td><a href="{{ url_for('extras.assignment_detail', assignment_id=a.id) }}">{{ a.title }}</a></td>
+        <td>{{ a.due_date or "—" }}{% if a.overdue and not a.submission_id %} <span class="tag danger">Overdue</span>{% endif %}</td>
+        <td>
+            {% if a.marks is not none %}Graded
+            {% elif a.submission_id %}Submitted
+            {% else %}Not submitted{% endif %}
+        </td>
+        <td>{{ ("%g / %g"|format(a.marks, a.max_marks)) if a.marks is not none else "—" }}</td>
+    </tr>
+    {% endfor %}
+</table>
+{% else %}
+<p>No assignments yet. Check back soon.</p>
+{% endif %}
+</div>
+{% endblock %}

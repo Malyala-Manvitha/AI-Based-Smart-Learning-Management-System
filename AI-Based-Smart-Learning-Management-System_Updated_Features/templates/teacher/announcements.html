@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+<h1>📢 Announcements</h1>
+
+<div class="form-card">
+    <h2>Post a new announcement</h2>
+    <form method="POST">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <label>Title</label>
+        <input type="text" name="title" maxlength="120" required>
+        <label>Message</label>
+        <textarea name="message" rows="4" maxlength="2000" required></textarea>
+        <button type="submit">Post</button>
+    </form>
+</div>
+
+{% for a in announcements %}
+<div class="section">
+    <h2>{{ a.title }}</h2>
+    <p class="muted">{{ a.created_at[:16] }}</p>
+    <p class="pre">{{ a.message }}</p>
+    <form method="POST" action="{{ url_for('teacher.delete_announcement', item_id=a.id) }}" onsubmit="return confirm('Delete this announcement?')">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+        <button type="submit" class="danger-btn">Delete</button>
+    </form>
+</div>
+{% endfor %}
+{% endblock %}

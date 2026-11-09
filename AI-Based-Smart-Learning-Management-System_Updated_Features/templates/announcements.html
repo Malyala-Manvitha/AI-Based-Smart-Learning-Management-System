@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}Announcements{% endblock %}
+{% block content %}
+<h1>📢 Announcements</h1>
+<p class="subtitle">News and updates from your teachers</p>
+
+{% for a in announcements %}
+<div class="section">
+    <h2>{{ a.title }}</h2>
+    <p class="muted">{{ a.created_at[:16] }}</p>
+    <p class="pre">{{ a.message }}</p>
+</div>
+{% else %}
+<div class="section"><p>No announcements yet.</p></div>
+{% endfor %}
+{% endblock %}
